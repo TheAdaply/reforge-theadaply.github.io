@@ -2,31 +2,51 @@
 
 The re-forge landing page, served at <https://theadaply.github.io/>.
 
-This repo holds the **built static output only** — plain HTML, CSS, JS and a
-logo. There is no backend, no dashboard, no API calls: the page is fully
-static and nothing runs behind it.
+Fully static: one `index.html` with inline CSS and JS, one logo, and two
+machine-readable trust artifacts. No backend, no API calls, no build step.
 
-## Source
+## Where this came from
 
-The page is built from the `showcase/` directory of the private
-`TheAdaply/re-forge` repo (Vite + React).
+The page is `services/dashboard/static/landing.html` from the private
+`TheAdaply/reforge-cloud` repo (commit `6f3ee7d`, 2026-07-21), where it was
+served by the dashboard service. It is the "The hundredth time should be
+faster." design.
 
-To rebuild and republish:
+| File | Source |
+| --- | --- |
+| `index.html` | `reforge-cloud/services/dashboard/static/landing.html` |
+| `static/reforge-mark.png` | `reforge-cloud/services/dashboard/static/` |
+| `FOR-AGENTS.md` | `reforge-cloud/clients/FOR-AGENTS.md` |
+| `CAPTURE-MANIFEST.json` | `reforge-cloud/clients/CAPTURE-MANIFEST.json` |
 
-```sh
-# in TheAdaply/re-forge
-cd showcase
-npm ci
-npm run build          # -> showcase/dist
+## Changes made when lifting it off the dashboard server
 
-# copy the landing page files into a clone of this repo, then commit + push
-cp dist/index.html dist/logo.jpeg dist/favicon-16.png dist/favicon-32.png \
-   dist/apple-touch-icon.png <clone>/
-rm -rf <clone>/assets && cp -R dist/assets <clone>/assets
-```
+The original page shipped a workspace sign-in that only worked with the
+dashboard backend behind it. On a static host every one of those paths is a
+dead end, so they were removed:
 
-`dist/` also contains standalone collateral (pitch/brief/tech/product pages,
-PDFs, the team-sync video). None of it is linked from the landing page, so it
-is deliberately **not** published here.
+- Dropped all three **"Open your dashboard"** buttons (nav, hero, final CTA).
+  The remaining **"Join the waitlist"** button was promoted to primary in the
+  nav and hero so each still has one.
+- Dropped the `<dialog class="connect">` workspace-key modal and the JS that
+  read/wrote `localStorage["reforge.dashboard.token"]` and redirected to
+  `/overview?token=…`.
+- Dropped the two hidden `already connected, open dashboard →` links.
+- Final CTA subline `One key signs this device in.` →
+  `One email when we open access.`, since there is no longer a key to enter.
+- `<link rel="alternate" href="/FOR-AGENTS">` → `/FOR-AGENTS.md`, so the file
+  resolves as a static asset instead of a server route.
 
-`.nojekyll` disables Jekyll processing so GitHub Pages serves the files as-is.
+Nothing else was touched. `git log` has the unmodified original as the parent
+of the commit that introduced it.
+
+## Known issue
+
+The three `View on GitHub` links point at `github.com/TheAdaply/re-forge`,
+which is a private repo — visitors get a 404.
+
+## Publishing
+
+GitHub Pages serves `main` at the repo root (legacy branch build, no Actions).
+Push to `main` and it redeploys. `.nojekyll` stops Jekyll from processing the
+files.
