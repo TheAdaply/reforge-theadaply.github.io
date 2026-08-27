@@ -1,6 +1,6 @@
-# theadaply.github.io
+# theadaply.com
 
-The re-forge landing page, served at <https://theadaply.github.io/>.
+The re-forge landing page, served at <https://theadaply.com/>.
 
 Fully static: one `index.html` with inline CSS and JS, one logo, and two
 machine-readable trust artifacts. No backend, no API calls, no build step.
